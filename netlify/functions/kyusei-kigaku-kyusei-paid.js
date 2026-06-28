@@ -1,19 +1,19 @@
-// api/kyusei-kigaku/kyusei-paid.js
+// netlify/functions/kyusei-kigaku-kyusei-paid.js
 // 九星気学・¥500鑑定のエンドポイント。
 // 入力：生年月日
 // 出力：本命星＋性格・才能の詳しい解釈＋今年・今月・今日の運気＋処出方位
 //
 // このファイルはサーバー側でのみ実行され、ブラウザには送られない。
 
-const { getHonmeisei, getHonmeiseiNumber, KYUSEI_NAMES, KYUSEI_GOGYO } = require('./honmeisei.js');
-const { getYearFortune, getFortuneByPeriod } = require('../shichu-suimei/gogyo-relation.js');
-const { getCurrentGetsuban } = require('./getsuban.js');
-const { getCurrentNichiban } = require('./nichiban.js');
-const { getYearPillar, getMonthPillar, getDayPillar } = require('../shichu-suimei/bazi.js');
+const { getHonmeisei, getHonmeiseiNumber, KYUSEI_NAMES, KYUSEI_GOGYO } = require('../../lib/kyusei-kigaku/honmeisei.js');
+const { getYearFortune, getFortuneByPeriod } = require('../../lib/shichu-suimei/gogyo-relation.js');
+const { getCurrentGetsuban } = require('../../lib/kyusei-kigaku/getsuban.js');
+const { getCurrentNichiban } = require('../../lib/kyusei-kigaku/nichiban.js');
+const { getYearPillar, getMonthPillar, getDayPillar } = require('../../lib/shichu-suimei/bazi.js');
 const {
   getBanHaichi, getGoOusatsuHoui, getAnkensatsuHoui,
   getHonmeisatsuHoui, getHonmeitekisatsuHoui, getHaHoui
-} = require('./houi.js');
+} = require('../../lib/kyusei-kigaku/houi.js');
 
 // 9つの本命星ごとの、性格・才能・適職の詳しい解釈（¥500鑑定用）
 const HONMEISEI_PERSONALITY = {
@@ -77,16 +77,13 @@ function getKyouHoui(centerNumber, honmeiseiNumber, junishi) {
   };
 }
 
-module.exports = (req, res) => {
-  if (req.method !== "POST") {
-    res.status(405).json({ error: "Method Not Allowed" });
-    return;
+exports.handler = async (event, context) => {
+  if (event.httpMethod !== "POST") {
+    return { statusCode: 405, body: JSON.stringify({ error: "Method Not Allowed" }) };
   }
 
-  let body = req.body;
-  if (typeof body === "string") {
-    try { body = JSON.parse(body); } catch (e) { body = {}; }
-  }
+  let body = {};
+  try { body = JSON.parse(event.body || "{}"); } catch (e) { body = {}; }
 
   const { year, month, day } = body || {};
   const y = parseInt(year, 10);
@@ -94,8 +91,7 @@ module.exports = (req, res) => {
   const d = parseInt(day, 10);
 
   if (!y || !m || !d || y < 1900 || y > 2035 || m < 1 || m > 12 || d < 1 || d > 31) {
-    res.status(400).json({ error: "生年月日が正しくありません。" });
-    return;
+    return { statusCode: 400, body: JSON.stringify({ error: "生年月日が正しくありません。" }) };
   }
 
   try {
@@ -126,44 +122,48 @@ module.exports = (req, res) => {
     const dayPillar = getDayPillar(thisYear, now.getMonth() + 1, now.getDate(), 12, 0);
     const dayHoui = getKyouHoui(nichiban.number, honmeisei.number, dayPillar.shi);
 
-    res.status(200).json({
-      honmeisei: {
-        number: honmeisei.number,
-        name: honmeisei.name,
-        gogyo: honmeisei.gogyo
-      },
-      personality: {
-        trait: personality.trait,
-        talent: personality.talent,
-        job: personality.job
-      },
-      yearFortune: {
-        year: thisYear,
-        yearCenterName: KYUSEI_NAMES[thisYearCenterNumber],
-        relation: yearFortune.relation,
-        label: yearFortune.label,
-        text: yearFortune.text,
-        houi: yearHoui
-      },
-      monthFortune: {
-        monthCenterName: getsuban.name,
-        termName: getsuban.termName,
-        relation: monthFortune.relation,
-        label: monthFortune.label,
-        text: monthFortune.text,
-        houi: monthHoui
-      },
-      dayFortune: {
-        dayCenterName: nichiban.name,
-        mode: nichiban.mode,
-        kanshi: nichiban.kanshi,
-        relation: dayFortune.relation,
-        label: dayFortune.label,
-        text: dayFortune.text,
-        houi: dayHoui
-      }
-    });
+    return {
+      statusCode: 200,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        honmeisei: {
+          number: honmeisei.number,
+          name: honmeisei.name,
+          gogyo: honmeisei.gogyo
+        },
+        personality: {
+          trait: personality.trait,
+          talent: personality.talent,
+          job: personality.job
+        },
+        yearFortune: {
+          year: thisYear,
+          yearCenterName: KYUSEI_NAMES[thisYearCenterNumber],
+          relation: yearFortune.relation,
+          label: yearFortune.label,
+          text: yearFortune.text,
+          houi: yearHoui
+        },
+        monthFortune: {
+          monthCenterName: getsuban.name,
+          termName: getsuban.termName,
+          relation: monthFortune.relation,
+          label: monthFortune.label,
+          text: monthFortune.text,
+          houi: monthHoui
+        },
+        dayFortune: {
+          dayCenterName: nichiban.name,
+          mode: nichiban.mode,
+          kanshi: nichiban.kanshi,
+          relation: dayFortune.relation,
+          label: dayFortune.label,
+          text: dayFortune.text,
+          houi: dayHoui
+        }
+      })
+    };
   } catch (e) {
-    res.status(500).json({ error: "計算中にエラーが発生しました。生年月日をご確認ください。" });
+    return { statusCode: 500, body: JSON.stringify({ error: "計算中にエラーが発生しました。生年月日をご確認ください。" }) };
   }
 };

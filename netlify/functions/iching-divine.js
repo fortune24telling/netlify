@@ -278,22 +278,20 @@ function buildPlanGuide(changingCount) {
   }
 }
 
-// ===== Vercel サーバーレス関数のエントリーポイント =====
-// POST /api/divine
+// ===== Netlify Functions のエントリーポイント =====
+// POST /.netlify/functions/iching-divine
 // body: { mode: "free" | "theme" | "question", category?: string }
 //   mode "free"     … 無料診断（問い固定、結果は卦名+一言のみ）
 //   mode "theme"    … ¥500診断・テーマ選択（category必須）
 //   mode "question" … ¥500診断・自由記述問い（結果は卦全体の一言解釈）
-module.exports = (req, res) => {
-  if (req.method !== "POST") {
-    res.status(405).json({ error: "Method Not Allowed" });
-    return;
+exports.handler = async (event, context) => {
+  if (event.httpMethod !== "POST") {
+    return { statusCode: 405, body: JSON.stringify({ error: "Method Not Allowed" }) };
   }
 
-  let body = req.body;
-  if (typeof body === "string") {
-    try { body = JSON.parse(body); } catch (e) { body = {}; }
-  }
+  let body = {};
+  try { body = JSON.parse(event.body || "{}"); } catch (e) { body = {}; }
+
   const mode = (body && body.mode) || "free";
   const category = body && body.category;
 
@@ -330,5 +328,9 @@ module.exports = (req, res) => {
     payload.planGuide = buildPlanGuide(hexagram.changingCount);
   }
 
-  res.status(200).json(payload);
+  return {
+    statusCode: 200,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  };
 };
