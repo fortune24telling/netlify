@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>本命星から知る、あなたの性質（無料） — 命理院 凜</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;800&family=Zen+Kaku+Gothic+New:wght@300;400;500;700&family=Cormorant+Garamond:ital,wght@0,500;1,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14110F; --paper:#EFE8D8; --vermilion:#B23A2E; --vermilion-deep:#8C2B22;
+    --gold:#C9A86A; --gold-soft:#E8D9B0; --jade:#3B5240; --line:rgba(201,168,106,0.28);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    background:var(--ink); color:var(--paper);
+    font-family:'Zen Kaku Gothic New', sans-serif; font-weight:300;
+    min-height:100vh; display:flex; align-items:flex-start; justify-content:center;
+    padding:36px 16px 60px; -webkit-font-smoothing:antialiased;
+  }
+  .mincho{font-family:'Shippori Mincho', serif;}
+  .stage{ width:100%; max-width:380px; text-align:center; }
+
+  .eyebrow{
+    font-family:'Cormorant Garamond', serif; font-style:italic; letter-spacing:0.18em;
+    font-size:12px; color:var(--gold); text-transform:uppercase; display:block; margin-bottom:14px;
+  }
+  .free-badge{
+    display:inline-block; font-size:10.5px; letter-spacing:0.05em; color:var(--jade);
+    border:1px solid var(--jade); padding:3px 10px; border-radius:20px; margin-bottom:14px;
+  }
+  .stage h1{ font-family:'Shippori Mincho', serif; font-weight:700; font-size:20px; letter-spacing:0.04em; margin-bottom:6px; line-height:1.5; }
+  .stage .sub{ font-size:12.5px; color:rgba(239,232,216,0.55); margin-bottom:30px; }
+
+  .screen{ display:none; }
+  .screen.active{ display:block; }
+
+  .form-card{
+    border:1px solid var(--line); background:rgba(239,232,216,0.03);
+    padding:24px 22px; margin-bottom:24px; text-align:left;
+  }
+  .form-card label{
+    display:block; font-size:12px; color:var(--gold); letter-spacing:0.04em; margin-bottom:10px;
+  }
+  .date-row{ display:flex; gap:8px; margin-bottom:6px; }
+  .date-row select{
+    flex:1; background:rgba(20,17,15,0.5); border:1px solid var(--line); color:var(--paper);
+    font-family:'Zen Kaku Gothic New', sans-serif; font-size:13.5px; padding:11px 8px;
+    border-radius:2px; appearance:none; text-align:center;
+  }
+  .date-row select:focus{ outline:none; border-color:var(--gold); }
+  .date-hint{ font-size:11px; color:rgba(239,232,216,0.4); margin-top:8px; }
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center; gap:8px; width:100%;max-width:300px;
+    padding:15px 24px; font-family:'Shippori Mincho', serif; font-size:14.5px;letter-spacing:0.06em;
+    border-radius:2px; cursor:pointer; transition:transform .2s ease, opacity .2s ease;
+  }
+  .btn-primary{
+    background:linear-gradient(135deg, var(--vermilion), var(--vermilion-deep));
+    color:var(--paper); border:1px solid rgba(232,217,176,0.25);
+  }
+  .btn:active{ transform:scale(0.97); }
+  .btn:disabled{ opacity:0.45; cursor:default; transform:none; }
+  .error-text{ font-size:12px; color:var(--vermilion); margin-top:10px; }
+
+  .calc-stage{ padding:50px 0 30px; }
+  .kyusei-anim{ width:200px; height:200px; margin:0 auto 28px; }
+  .calc-status{ font-size:13px; color:rgba(239,232,216,0.6); letter-spacing:0.04em; }
+
+  .result-eyebrow{ font-size:11.5px; color:var(--gold); letter-spacing:0.06em; margin-bottom:10px; }
+  .star-display{
+    width:150px; height:150px; margin:0 auto 18px;
+    border:1px solid var(--gold); border-radius:50%;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background:linear-gradient(160deg, rgba(201,168,106,0.1), transparent 70%);
+  }
+  .star-display .number{
+    font-family:'Cormorant Garamond',serif; font-style:italic; font-size:38px; color:var(--vermilion); line-height:1;
+  }
+  .star-display .name{
+    font-family:'Shippori Mincho',serif; font-size:17px; color:var(--gold-soft); margin-top:6px;
+  }
+  .star-display .gogyo{
+    font-size:10.5px; color:rgba(239,232,216,0.45); margin-top:6px; letter-spacing:0.05em;
+  }
+  .result-sub{ font-size:12px; color:rgba(239,232,216,0.5); margin-bottom:24px; }
+
+  .interp-card{
+    border:1px solid var(--line); background:rgba(239,232,216,0.03); padding:20px 20px 18px; text-align:left; margin-bottom:18px;
+  }
+  .interp-card .label{ font-size:11px; color:var(--gold); letter-spacing:0.05em; margin-bottom:8px; display:block; }
+  .interp-card p{ font-size:13px; color:rgba(239,232,216,0.8); line-height:1.85; }
+
+  .locked-card{
+    border:1px dashed var(--line); padding:16px 18px; text-align:left; margin-bottom:24px; background:rgba(239,232,216,0.015);
+  }
+  .locked-card .label{ font-size:11px; color:rgba(239,232,216,0.4); letter-spacing:0.05em; margin-bottom:10px; display:block; }
+  .locked-row{ display:flex; gap:10px; font-size:12.5px; color:rgba(239,232,216,0.45); margin-bottom:8px; align-items:flex-start; }
+  .locked-row:last-child{ margin-bottom:0; }
+  .locked-row .mark{ flex-shrink:0; width:14px; color:rgba(239,232,216,0.3); }
+
+  .upsell-card{
+    border:1px solid var(--vermilion); box-shadow:0 0 0 1px var(--vermilion);
+    padding:20px 20px 18px; text-align:left; margin-bottom:14px; background:rgba(178,58,46,0.06);
+  }
+  .upsell-card .ribbon{
+    display:inline-block; background:var(--vermilion); color:var(--paper); font-size:10px; padding:3px 10px;
+    font-family:'Shippori Mincho',serif; margin-bottom:10px;
+  }
+  .upsell-card h4{ font-family:'Shippori Mincho',serif; font-size:16px; margin-bottom:8px; }
+  .upsell-card p{ font-size:12.5px; color:rgba(239,232,216,0.7); margin-bottom:14px; line-height:1.75; }
+  .upsell-card .price{ font-family:'Cormorant Garamond',serif; font-size:20px; color:var(--gold-soft); margin-bottom:14px; display:block; }
+  .upsell-card a{
+    display:block; text-align:center; font-size:13.5px; font-family:'Shippori Mincho',serif; padding:13px;
+    background:var(--gold); color:var(--ink); font-weight:600; text-decoration:none;
+  }
+  .upsell-card.premium{ border-color:var(--gold); box-shadow:0 0 0 1px var(--gold); background:rgba(201,168,106,0.06); }
+  .upsell-card.premium .ribbon{ background:var(--gold); color:var(--ink); }
+  .upsell-card.premium a{ background:transparent; border:1px solid var(--gold); color:var(--gold-soft); font-weight:400; }
+
+  .retry-link{ display:block; text-align:center; margin-top:8px; font-size:12px; color:rgba(239,232,216,0.4); text-decoration:underline; }
+  .back-link{ display:block; text-align:center; margin-top:14px; font-size:11.5px; color:rgba(239,232,216,0.35); text-decoration:underline; }
+
+  @media (prefers-reduced-motion: reduce){ .spin{ animation-duration:0.01s !important; } }
+</style>
+</head>
+<body>
+
+<div class="stage">
+
+  <!-- SCREEN 1: 入力 -->
+  <div class="screen active" id="screenInput">
+    <span class="eyebrow">Kyusei Kigaku ・ Nine Star Ki</span>
+    <span class="free-badge">無料診断</span>
+    <h1 class="mincho">本命星から知る、<br>あなたの性質</h1>
+    <p class="sub">生年月日から「本命星」を算出し、<br>あなたの核となる性質を診断します</p>
+
+    <div class="form-card">
+      <label>生年月日（西暦）</label>
+      <div class="date-row">
+        <select id="selYear"></select>
+        <select id="selMonth"></select>
+        <select id="selDay"></select>
+      </div>
+      <p class="date-hint">九星気学では立春（2月4日頃）を年の境とします。境界付近の生年月日も自動で正しく判定されます。</p>
+    </div>
+
+    <button class="btn btn-primary" id="startBtn" style="margin:0 auto;" disabled>本命星を読み解く</button>
+    <div class="error-text" id="errorText"></div>
+  </div>
+
+  <!-- SCREEN 2: 計算中 -->
+  <div class="screen" id="screenCalc">
+    <span class="eyebrow">Kyusei Kigaku ・ Nine Star Ki</span>
+    <h1 class="mincho">本命星を算出しています</h1>
+
+    <div class="calc-stage">
+      <svg class="kyusei-anim" viewBox="0 0 200 200" id="kyuseiSvg">
+        <circle cx="100" cy="100" r="92" fill="none" stroke="#C9A86A" stroke-opacity="0.2" stroke-width="1"/>
+        <g id="orbitGroup" style="transform-origin:100px 100px;">
+          <circle cx="100" cy="22" r="5" fill="#B23A2E"/>
+          <circle cx="155" cy="45" r="4" fill="#C9A86A"/>
+          <circle cx="178" cy="100" r="5" fill="#B23A2E"/>
+          <circle cx="155" cy="155" r="4" fill="#C9A86A"/>
+          <circle cx="100" cy="178" r="5" fill="#B23A2E"/>
+          <circle cx="45" cy="155" r="4" fill="#C9A86A"/>
+          <circle cx="22" cy="100" r="5" fill="#B23A2E"/>
+          <circle cx="45" cy="45" r="4" fill="#C9A86A"/>
+        </g>
+        <circle cx="100" cy="100" r="34" fill="none" stroke="#C9A86A" stroke-width="1.2"/>
+        <text x="100" y="107" text-anchor="middle" font-family="Shippori Mincho, serif" fill="#C9A86A" font-size="18" font-weight="800">九星</text>
+      </svg>
+      <p class="calc-status" id="calcStatus">立春を確認しています…</p>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: 結果 -->
+  <div class="screen" id="screenResult">
+    <div class="result-eyebrow">あなたの本命星は</div>
+    <div class="star-display">
+      <div class="number" id="resultNumber"></div>
+      <div class="name mincho" id="resultName"></div>
+      <div class="gogyo" id="resultGogyo"></div>
+    </div>
+    <p class="result-sub">本命星は、九星気学であなたの核となる性質を示す星です</p>
+
+    <div class="interp-card">
+      <span class="label">この本命星が示すもの</span>
+      <p id="interpText"></p>
+    </div>
+
+    <div class="locked-card">
+      <span class="label">無料診断には含まれません</span>
+      <div class="locked-row"><span class="mark">－</span><span>性格・才能・向いている方向性の詳しい解釈</span></div>
+      <div class="locked-row"><span class="mark">－</span><span>今年の運気（年盤の巡りとの関係）</span></div>
+      <div class="locked-row"><span class="mark">－</span><span>具体的な悩みへの当てはめ、吉方位の指導</span></div>
+    </div>
+
+    <div class="upsell-card">
+      <span class="ribbon">¥500鑑定</span>
+      <h4 class="mincho">性格と今年の運気を読み解く</h4>
+      <p>本命星から、性格・才能・向いている方向性を詳しく診断し、今年の運気の巡りまでお伝えします。</p>
+      <span class="price">¥500 / 1回</span>
+      <a href="paid.html">¥500鑑定をはじめる</a>
+    </div>
+
+    <div class="upsell-card premium">
+      <span class="ribbon">個別鑑定</span>
+      <h4 class="mincho">鑑定士に相談する</h4>
+      <p>事前にお悩みをお伺いし、鑑定士があなたの本命星を、具体的な状況や吉方位に当てはめて手作業で読み解きます。</p>
+      <span class="price">¥20,000</span>
+      <a href="#">個別鑑定を申し込む</a>
+    </div>
+
+    <a class="retry-link" id="retryLink" href="#">別の生年月日でもう一度占う</a>
+    <a class="back-link" href="../index.html">他の占術から選びなおす</a>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  // ============================================================
+  // このスクリプトは見た目の制御だけを行います。
+  // 本命星の算出ロジック・解釈テキストはサーバー側
+  // （/api/kyusei-kigaku/kyusei-free）にあり、ここには存在しません。
+  // ============================================================
+
+  var selYear = document.getElementById('selYear');
+  var selMonth = document.getElementById('selMonth');
+  var selDay = document.getElementById('selDay');
+  var startBtn = document.getElementById('startBtn');
+  var errorText = document.getElementById('errorText');
+
+  var screenInput = document.getElementById('screenInput');
+  var screenCalc = document.getElementById('screenCalc');
+  var screenResult = document.getElementById('screenResult');
+  var calcStatus = document.getElementById('calcStatus');
+  var orbitGroup = document.getElementById('orbitGroup');
+
+  var resultNumber = document.getElementById('resultNumber');
+  var resultName = document.getElementById('resultName');
+  var resultGogyo = document.getElementById('resultGogyo');
+  var interpText = document.getElementById('interpText');
+  var retryLink = document.getElementById('retryLink');
+
+  var currentYear = new Date().getFullYear();
+  selYear.insertAdjacentHTML('beforeend', '<option value="" disabled selected>年</option>');
+  for (var y = currentYear; y >= 1930; y--) {
+    var optY = document.createElement('option');
+    optY.value = y; optY.textContent = y + '年';
+    selYear.appendChild(optY);
+  }
+
+  selMonth.insertAdjacentHTML('beforeend', '<option value="" disabled selected>月</option>');
+  for (var m = 1; m <= 12; m++) {
+    var optM = document.createElement('option');
+    optM.value = m; optM.textContent = m + '月';
+    selMonth.appendChild(optM);
+  }
+
+  function rebuildDayOptions(){
+    var y = parseInt(selYear.value, 10);
+    var m = parseInt(selMonth.value, 10);
+    var daysInMonth = (y && m) ? new Date(y, m, 0).getDate() : 31;
+    var currentVal = selDay.value;
+    selDay.innerHTML = '<option value="" disabled selected>日</option>';
+    for (var d = 1; d <= daysInMonth; d++) {
+      var optD = document.createElement('option');
+      optD.value = d; optD.textContent = d + '日';
+      selDay.appendChild(optD);
+    }
+    if (currentVal && parseInt(currentVal, 10) <= daysInMonth) {
+      selDay.value = currentVal;
+    }
+  }
+  rebuildDayOptions();
+  selYear.addEventListener('change', rebuildDayOptions);
+  selMonth.addEventListener('change', rebuildDayOptions);
+
+  function updateStartBtn(){
+    var ready = selYear.value && selMonth.value && selDay.value;
+    startBtn.disabled = !ready;
+  }
+  [selYear, selMonth, selDay].forEach(function(el){
+    el.addEventListener('change', updateStartBtn);
+  });
+
+  function showScreen(el){
+    [screenInput, screenCalc, screenResult].forEach(function(s){ s.classList.remove('active'); });
+    el.classList.add('active');
+  }
+
+  function requestDiagnosis(year, month, day){
+    return fetch('/api/kyusei-kigaku/kyusei-free', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ year: year, month: month, day: day })
+    }).then(function(r){
+      if(!r.ok) return r.json().then(function(d){ throw new Error(d.error || 'request failed'); });
+      return r.json();
+    });
+  }
+
+  var orbitAngle = 0;
+  var orbitTimer = null;
+  function startOrbitAnimation(){
+    orbitAngle = 0;
+    orbitTimer = setInterval(function(){
+      orbitAngle += 4;
+      orbitGroup.style.transform = 'rotate(' + orbitAngle + 'deg)';
+    }, 30);
+  }
+  function stopOrbitAnimation(){
+    if(orbitTimer) clearInterval(orbitTimer);
+  }
+
+  var statusMessages = ['立春を確認しています…', '本命星を算出しています…', '五行のバランスを見ています…'];
+  var statusTimer = null;
+  function startStatusCycle(){
+    var i = 0;
+    calcStatus.textContent = statusMessages[0];
+    statusTimer = setInterval(function(){
+      i = (i + 1) % statusMessages.length;
+      calcStatus.textContent = statusMessages[i];
+    }, 700);
+  }
+  function stopStatusCycle(){
+    if(statusTimer) clearInterval(statusTimer);
+  }
+
+  startBtn.addEventListener('click', function(){
+    errorText.textContent = '';
+    startBtn.disabled = true;
+
+    var year = selYear.value, month = selMonth.value, day = selDay.value;
+
+    showScreen(screenCalc);
+    startOrbitAnimation();
+    startStatusCycle();
+
+    var requestPromise = requestDiagnosis(year, month, day);
+    var minDisplayTime = new Promise(function(resolve){ setTimeout(resolve, 1800); });
+
+    Promise.all([requestPromise, minDisplayTime]).then(function(results){
+      var data = results[0];
+      stopOrbitAnimation();
+      stopStatusCycle();
+
+      resultNumber.textContent = data.honmeisei.number;
+      resultName.textContent = data.honmeisei.name;
+      resultGogyo.textContent = '五行：' + data.honmeisei.gogyo;
+      interpText.textContent = data.interpretation.text;
+
+      showScreen(screenResult);
+    }).catch(function(err){
+      stopOrbitAnimation();
+      stopStatusCycle();
+      showScreen(screenInput);
+      errorText.textContent = err.message || '通信に失敗しました。もう一度お試しください。';
+      updateStartBtn();
+    });
+  });
+
+  retryLink.addEventListener('click', function(e){
+    e.preventDefault();
+    showScreen(screenInput);
+  });
+})();
+</script>
+
+</body>
+</html>

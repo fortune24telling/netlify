@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>易占 ¥500鑑定 — 命理院 凜</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;800&family=Zen+Kaku+Gothic+New:wght@300;400;500;700&family=Cormorant+Garamond:ital,wght@0,500;1,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14110F; --paper:#EFE8D8; --vermilion:#B23A2E; --vermilion-deep:#8C2B22;
+    --gold:#C9A86A; --gold-soft:#E8D9B0; --jade:#3B5240; --line:rgba(201,168,106,0.28);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    background:var(--ink); color:var(--paper);
+    font-family:'Zen Kaku Gothic New', sans-serif; font-weight:300;
+    min-height:100vh; display:flex; align-items:flex-start; justify-content:center;
+    padding:36px 16px 60px; -webkit-font-smoothing:antialiased;
+  }
+  .mincho{font-family:'Shippori Mincho', serif;}
+  .stage{ width:100%; max-width:380px; text-align:center; }
+  .eyebrow{
+    font-family:'Cormorant Garamond', serif; font-style:italic; letter-spacing:0.18em;
+    font-size:12px; color:var(--gold); text-transform:uppercase; display:block; margin-bottom:14px;
+  }
+  .paid-badge{
+    display:inline-block; font-size:10.5px; letter-spacing:0.05em; color:var(--vermilion);
+    border:1px solid var(--vermilion); padding:3px 10px; border-radius:20px; margin-bottom:14px;
+  }
+  .stage h1{ font-family:'Shippori Mincho', serif; font-weight:700; font-size:21px; letter-spacing:0.04em; margin-bottom:6px; }
+  .stage .sub{ font-size:12.5px; color:rgba(239,232,216,0.55); margin-bottom:30px; }
+
+  .screen{ display:none; }
+  .screen.active{ display:block; }
+
+  .mode-tabs{ display:flex; gap:8px; margin-bottom:18px; }
+  .mode-tab{
+    flex:1; padding:11px 8px; font-size:12.5px; font-family:'Shippori Mincho', serif;
+    color:rgba(239,232,216,0.5); background:transparent; border:1px solid var(--line);
+    border-radius:2px; cursor:pointer; transition:all .2s ease;
+  }
+  .mode-tab.active{ color:var(--ink); background:var(--gold); border-color:var(--gold); font-weight:600; }
+
+  .cat-card, .q-card{
+    border:1px solid var(--line); background:rgba(239,232,216,0.03);
+    padding:20px 20px 16px; text-align:left; margin-bottom:18px;
+  }
+  .cat-card label, .q-card label{ display:block; font-size:12px; color:var(--gold); letter-spacing:0.04em; margin-bottom:12px; }
+  .cat-hint, .q-hint{ font-size:11px; color:rgba(239,232,216,0.4); margin-top:10px; }
+  .cat-grid{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+  .cat-chip{
+    display:flex;flex-direction:column;align-items:center;justify-content:center; gap:4px;
+    border:1px solid var(--line); border-radius:3px; padding:10px 4px; font-size:11.5px;
+    color:rgba(239,232,216,0.65); cursor:pointer; transition:all .2s ease; user-select:none;
+  }
+  .cat-chip .ico{ font-size:16px; font-family:'Shippori Mincho',serif; color:var(--gold); }
+  .cat-chip.selected{ border-color:var(--vermilion); background:rgba(178,58,46,0.12); color:var(--gold-soft); }
+  .cat-chip.selected .ico{ color:var(--vermilion); }
+
+  .q-card textarea{
+    width:100%; background:rgba(20,17,15,0.5); border:1px solid var(--line); color:var(--paper);
+    font-family:'Zen Kaku Gothic New', sans-serif; font-size:13.5px; padding:12px 14px;
+    border-radius:2px; resize:none; min-height:64px; line-height:1.7;
+  }
+  .q-card textarea:focus{ outline:none; border-color:var(--gold); }
+  .q-card textarea::placeholder{ color:rgba(239,232,216,0.32); }
+  .q-presets{ display:flex;flex-wrap:wrap;gap:8px; margin-top:12px; }
+  .q-presets button{
+    font-size:11.5px; color:rgba(239,232,216,0.6); background:transparent; border:1px solid var(--line);
+    padding:6px 12px; border-radius:20px; font-family:'Zen Kaku Gothic New', sans-serif; cursor:pointer;
+  }
+
+  .coin-tray{ display:flex; justify-content:center; gap:18px; height:120px; align-items:center; margin-bottom:18px; perspective:600px; }
+  .coin{ width:58px;height:58px; position:relative; transform-style:preserve-3d; }
+  .coin .face{
+    position:absolute;inset:0; border-radius:50%; display:flex;align-items:center;justify-content:center;
+    backface-visibility:hidden; border:1px solid var(--gold); font-family:'Shippori Mincho',serif; font-size:13px; font-weight:700;
+  }
+  .coin .face.omote{ background:radial-gradient(circle at 35% 30%, #E8D9B0, #B8923F 75%); color:#3A2C12; }
+  .coin .face.ura{ background:radial-gradient(circle at 35% 30%, #4a4138, #1c1714 75%); color:var(--gold-soft); transform:rotateY(180deg); }
+  .coin.tossing{ animation:toss 0.9s cubic-bezier(.34,1.56,.64,1) forwards; }
+  .coin.result-omote{ transform:rotateY(0deg); }
+  .coin.result-ura{ transform:rotateY(180deg); }
+  @keyframes toss{
+    0%{ transform:translateY(0) rotateY(0deg) rotateX(0deg); }
+    35%{ transform:translateY(-46px) rotateY(540deg) rotateX(120deg); }
+    70%{ transform:translateY(-10px) rotateY(1080deg) rotateX(240deg); }
+    100%{ transform:translateY(0) rotateY(var(--final-y, 1440deg)) rotateX(360deg); }
+  }
+  .coin-labels{ display:flex;justify-content:center;gap:18px; margin-bottom:26px; height:16px; }
+  .coin-labels span{ width:58px; font-size:11px; color:var(--gold); letter-spacing:0.04em; opacity:0; transition:opacity .3s ease; }
+  .coin-labels span.show{ opacity:1; }
+
+  .status-row{ display:flex; justify-content:center; align-items:center; gap:14px; margin-bottom:22px; font-size:12.5px; color:rgba(239,232,216,0.6); }
+  .status-row .count{ color:var(--gold-soft); font-family:'Cormorant Garamond',serif; font-size:18px; }
+  .status-row .divider{ color:var(--line); }
+
+  .hexagram{ display:flex; flex-direction:column-reverse; gap:9px; width:160px; margin:0 auto 24px; }
+  .yao{ height:11px; width:100%; position:relative; opacity:0.18; transition:opacity .5s ease; }
+  .yao.placed{ opacity:1; }
+  .yao .bar{ position:absolute;inset:0; background:var(--gold); border-radius:1px; }
+  .yao.yin .bar{ left:0; width:42%; }
+  .yao .bar.right{ display:none; }
+  .yao.yin .bar.right{ left:58%; width:42%; display:block; }
+  .yao .changing-dot{
+    position:absolute; left:50%; top:50%; width:5px;height:5px; border-radius:50%;
+    background:var(--vermilion); transform:translate(-50%,-50%) scale(0); transition:transform .35s ease;
+  }
+  .yao.changing .changing-dot{ transform:translate(-50%,-50%) scale(1); }
+
+  .throw-detail{ min-height:18px; font-size:12px; color:rgba(239,232,216,0.45); margin-bottom:20px; }
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center; gap:8px; width:100%;max-width:300px;
+    padding:15px 24px; font-family:'Shippori Mincho', serif; font-size:14.5px;letter-spacing:0.06em;
+    border-radius:2px; cursor:pointer; transition:transform .2s ease, opacity .2s ease;
+  }
+  .btn-primary{ background:linear-gradient(135deg, var(--vermilion), var(--vermilion-deep)); color:var(--paper); border:1px solid rgba(232,217,176,0.25); }
+  .btn:active{ transform:scale(0.97); }
+  .btn:disabled{ opacity:0.45; cursor:default; transform:none; }
+
+  .result-eyebrow{ font-size:11.5px; color:var(--gold); letter-spacing:0.06em; margin-bottom:8px; }
+  .result-name{ font-family:'Shippori Mincho',serif; font-size:25px; color:var(--gold-soft); margin-bottom:4px; }
+  .result-sub{ font-size:12px; color:rgba(239,232,216,0.5); margin-bottom:22px; }
+
+  .interp-card, .theme-card{
+    border:1px solid var(--line); background:rgba(239,232,216,0.03); padding:18px 20px; text-align:left; margin-bottom:18px;
+  }
+  .interp-card .label, .theme-card .theme-label{ font-size:11px; color:var(--gold); letter-spacing:0.05em; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+  .interp-card p, .theme-card p{ font-size:13px; color:rgba(239,232,216,0.8); line-height:1.85; }
+  .theme-card .dot{ width:6px;height:6px;border-radius:50%;background:var(--vermilion); }
+
+  .plan-card{ border:1px solid var(--line); padding:18px 20px; text-align:left; margin-bottom:14px; background:rgba(239,232,216,0.02); position:relative; }
+  .plan-card.recommended{ border-color:var(--vermilion); box-shadow:0 0 0 1px var(--vermilion); }
+  .plan-ribbon{ position:absolute; top:-1px; right:14px; background:var(--vermilion); color:var(--paper); font-size:10px; padding:3px 10px; font-family:'Shippori Mincho',serif; }
+  .plan-head{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px; }
+  .plan-head h4{ font-family:'Shippori Mincho',serif; font-size:15px; }
+  .plan-head .price{ font-family:'Cormorant Garamond',serif; font-size:18px; color:var(--gold-soft); }
+  .plan-card p{ font-size:12.5px; color:rgba(239,232,216,0.65); margin-bottom:12px; }
+  .plan-card a{ display:block; text-align:center; font-size:12.5px; font-family:'Shippori Mincho',serif; padding:10px; border:1px solid var(--line); color:var(--gold-soft); text-decoration:none; }
+  .plan-card.recommended a{ background:var(--gold); color:var(--ink); border-color:var(--gold); font-weight:600; }
+
+  .retry-link{ display:block; text-align:center; margin-top:18px; font-size:12px; color:rgba(239,232,216,0.45); text-decoration:underline; }
+  .error-text{ font-size:12px; color:var(--vermilion); margin-top:10px; }
+
+  @media (prefers-reduced-motion: reduce){ .coin.tossing{ animation-duration:0.01s; } }
+</style>
+</head>
+<body>
+
+<div class="stage">
+
+  <!-- SCREEN 1: 入力 -->
+  <div class="screen active" id="screenQuestion">
+    <span class="eyebrow">I Ching ・ Coin Oracle</span>
+    <span class="paid-badge">¥500鑑定</span>
+    <h1 class="mincho">易占</h1>
+    <p class="sub">問いを定めてからコインを投じます</p>
+
+    <div class="mode-tabs">
+      <button type="button" class="mode-tab active" data-mode="theme">テーマから選ぶ</button>
+      <button type="button" class="mode-tab" data-mode="free">問いを自分で書く</button>
+    </div>
+
+    <div class="cat-card" id="themeMode">
+      <label>気になるテーマを1つ選ぶ</label>
+      <div class="cat-grid" id="catGrid">
+        <div class="cat-chip" data-cat="work"><span class="ico">仕</span><span>仕事</span></div>
+        <div class="cat-chip" data-cat="love"><span class="ico">恋</span><span>恋愛・対人</span></div>
+        <div class="cat-chip" data-cat="health"><span class="ico">健</span><span>健康</span></div>
+        <div class="cat-chip" data-cat="money"><span class="ico">金</span><span>金運</span></div>
+        <div class="cat-chip" data-cat="study"><span class="ico">学</span><span>学業</span></div>
+        <div class="cat-chip" data-cat="travel"><span class="ico">旅</span><span>旅行</span></div>
+        <div class="cat-chip" data-cat="birth"><span class="ico">産</span><span>出産</span></div>
+        <div class="cat-chip" data-cat="wish"><span class="ico">願</span><span>願望</span></div>
+      </div>
+      <p class="cat-hint">易占は「一つの問いに一つの卦」が基本のため、テーマは1つだけお選びください。</p>
+    </div>
+
+    <div class="q-card" id="freeMode" style="display:none;">
+      <label>今、占いたいことを一言で</label>
+      <textarea id="questionInput" maxlength="60" placeholder="例：転職するか今の会社に残るか、どちらが良いか"></textarea>
+      <p class="q-hint">テーマ選択では拾えない、具体的な問いに向いています</p>
+      <div class="q-presets">
+        <button type="button" data-q="今の会社に残るか、転職するか">A案かB案かで迷っている</button>
+        <button type="button" data-q="この人に今、連絡をしてもいいか">連絡すべきか迷っている</button>
+        <button type="button" data-q="この話を今、人に伝えるべきか">伝えるべきか迷っている</button>
+        <button type="button" data-q="今が決断のタイミングかどうか">今がその時かどうか</button>
+        <button type="button" data-q="この計画は進めても大丈夫か">計画を進めて大丈夫か</button>
+        <button type="button" data-q="今、距離を置くべきか、近づくべきか">距離を置くか近づくか</button>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="toCoinBtn" style="margin:0 auto;" disabled>問いを定めて占う</button>
+    <div class="error-text" id="errorText"></div>
+  </div>
+
+  <!-- SCREEN 2: コイン投げ -->
+  <div class="screen" id="screenCoin">
+    <span class="eyebrow">I Ching ・ Coin Oracle</span>
+    <h1 class="mincho">易占 鑑定中</h1>
+    <p class="sub" id="questionRecall"></p>
+
+    <div class="coin-tray">
+      <div class="coin" id="coin0"><div class="face omote">陽</div><div class="face ura">陰</div></div>
+      <div class="coin" id="coin1"><div class="face omote">陽</div><div class="face ura">陰</div></div>
+      <div class="coin" id="coin2"><div class="face omote">陽</div><div class="face ura">陰</div></div>
+    </div>
+    <div class="coin-labels" id="coinLabels">
+      <span id="label0"></span><span id="label1"></span><span id="label2"></span>
+    </div>
+
+    <div class="status-row">
+      <span>第 <span class="count" id="throwCount">0</span> / 6 投目</span>
+      <span class="divider">｜</span>
+      <span id="statusText">占い中…</span>
+    </div>
+
+    <div class="hexagram" id="hexagram">
+      <div class="yao"><div class="bar"></div><div class="bar right"></div><div class="changing-dot"></div></div>
+      <div class="yao"><div class="bar"></div><div class="bar right"></div><div class="changing-dot"></div></div>
+      <div class="yao"><div class="bar"></div><div class="bar right"></div><div class="changing-dot"></div></div>
+      <div class="yao"><div class="bar"></div><div class="bar right"></div><div class="changing-dot"></div></div>
+      <div class="yao"><div class="bar"></div><div class="bar right"></div><div class="changing-dot"></div></div>
+      <div class="yao"><div class="bar"></div><div class="bar right"></div><div class="changing-dot"></div></div>
+    </div>
+
+    <div class="throw-detail" id="throwDetail">&nbsp;</div>
+  </div>
+
+  <!-- SCREEN 3: 結果 -->
+  <div class="screen" id="screenResult">
+    <div class="result-eyebrow">出た卦は</div>
+    <div class="result-name mincho" id="resultHexName"></div>
+    <div class="result-sub" id="resultHexSub"></div>
+
+    <div id="interpArea"></div>
+    <div id="planArea"></div>
+
+    <a class="retry-link" id="retryLink" href="#">別の問いでもう一度占う</a>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  // ============================================================
+  // このスクリプトは「見た目の制御」だけを行います。
+  // コインの判定ロジック・64卦データ・解釈テンプレートは
+  // すべてサーバー側（/api/divine）にあり、ここには存在しません。
+  // ============================================================
+
+  var modeTabs = Array.prototype.slice.call(document.querySelectorAll('.mode-tab'));
+  var themeMode = document.getElementById('themeMode');
+  var freeMode = document.getElementById('freeMode');
+  var catChips = Array.prototype.slice.call(document.querySelectorAll('.cat-chip'));
+  var questionInput = document.getElementById('questionInput');
+  var toCoinBtn = document.getElementById('toCoinBtn');
+  var errorText = document.getElementById('errorText');
+
+  var screenQuestion = document.getElementById('screenQuestion');
+  var screenCoin = document.getElementById('screenCoin');
+  var screenResult = document.getElementById('screenResult');
+  var questionRecall = document.getElementById('questionRecall');
+
+  var coinEls = [document.getElementById('coin0'), document.getElementById('coin1'), document.getElementById('coin2')];
+  var labelEls = [document.getElementById('label0'), document.getElementById('label1'), document.getElementById('label2')];
+  var throwCountEl = document.getElementById('throwCount');
+  var statusTextEl = document.getElementById('statusText');
+  var throwDetailEl = document.getElementById('throwDetail');
+  var yaoEls = Array.prototype.slice.call(document.querySelectorAll('#screenCoin .yao'));
+
+  var resultHexName = document.getElementById('resultHexName');
+  var resultHexSub = document.getElementById('resultHexSub');
+  var interpArea = document.getElementById('interpArea');
+  var planArea = document.getElementById('planArea');
+  var retryLink = document.getElementById('retryLink');
+
+  var currentMode = 'theme';
+  var selectedCat = null;
+
+  function escapeHtml(str){
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function updateStartBtn(){
+    var ready = (currentMode === 'theme' && selectedCat !== null) ||
+                (currentMode === 'free' && questionInput.value.trim().length > 0);
+    toCoinBtn.disabled = !ready;
+  }
+
+  function setMode(mode){
+    currentMode = mode;
+    modeTabs.forEach(function(tab){ tab.classList.toggle('active', tab.getAttribute('data-mode') === mode); });
+    themeMode.style.display = mode === 'theme' ? '' : 'none';
+    freeMode.style.display = mode === 'free' ? '' : 'none';
+    updateStartBtn();
+  }
+
+  modeTabs.forEach(function(tab){
+    tab.addEventListener('click', function(){ setMode(tab.getAttribute('data-mode')); });
+  });
+
+  catChips.forEach(function(chip){
+    chip.addEventListener('click', function(){
+      var cat = chip.getAttribute('data-cat');
+      if(selectedCat === cat){
+        selectedCat = null;
+        chip.classList.remove('selected');
+      } else {
+        selectedCat = cat;
+        catChips.forEach(function(c){ c.classList.remove('selected'); });
+        chip.classList.add('selected');
+      }
+      updateStartBtn();
+    });
+  });
+
+  document.querySelectorAll('.q-presets button').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      questionInput.value = btn.getAttribute('data-q');
+      questionInput.focus();
+      updateStartBtn();
+    });
+  });
+  questionInput.addEventListener('input', updateStartBtn);
+
+  function showScreen(el){
+    [screenQuestion, screenCoin, screenResult].forEach(function(s){ s.classList.remove('active'); });
+    el.classList.add('active');
+  }
+
+  // ---- コインの見た目アニメーションだけを担当（表裏はサーバーから渡された値を使う） ----
+  function animateCoins(coinResults, callback){
+    coinEls.forEach(function(coin, i){
+      coin.classList.remove('result-omote','result-ura','tossing');
+      var finalTurns = 4 + Math.floor(Math.random()*2);
+      var extraHalf = coinResults[i] === 'ura' ? 1 : 0;
+      coin.style.setProperty('--final-y', (finalTurns*360 + extraHalf*180) + 'deg');
+      void coin.offsetWidth;
+      coin.classList.add('tossing');
+    });
+    labelEls.forEach(function(l){ l.classList.remove('show'); });
+
+    setTimeout(function(){
+      coinEls.forEach(function(coin, i){
+        coin.classList.remove('tossing');
+        coin.classList.add(coinResults[i] === 'omote' ? 'result-omote' : 'result-ura');
+      });
+      labelEls.forEach(function(l, i){
+        l.textContent = coinResults[i] === 'omote' ? '陽 ・ 表' : '陰 ・ 裏';
+        l.classList.add('show');
+      });
+      callback();
+    }, 950);
+  }
+
+  function placeYao(index, yin, changing){
+    var el = yaoEls[index];
+    el.classList.add('placed');
+    if(yin) el.classList.add('yin');
+    if(changing) el.classList.add('changing');
+  }
+
+  // ---- サーバーに「占って」とリクエストし、結果を受け取る ----
+  function requestDivination(mode, category){
+    return fetch('/api/iching/divine', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode: mode, category: category })
+    }).then(function(r){
+      if(!r.ok) throw new Error('request failed');
+      return r.json();
+    });
+  }
+
+  // ---- サーバーから受け取った6投分の結果を、順番にアニメーション再生する ----
+  function playThrows(throws, onDone){
+    var step = 0;
+    function next(){
+      if(step >= throws.length){ onDone(); return; }
+      throwCountEl.textContent = String(step + 1);
+      var t = throws[step];
+      animateCoins(t.coins, function(){
+        placeYao(step, t.yin, t.changing);
+        step++;
+        setTimeout(next, 480);
+      });
+    }
+    next();
+  }
+
+  function buildPlanHtml(planGuide){
+    if(!planGuide) return '';
+    return (
+      '<div class="plan-card">' +
+        '<div class="plan-head"><h4 class="mincho">具体的な問いへの鑑定</h4><span class="price">¥500</span></div>' +
+        '<p>' + escapeHtml(planGuide.sub500) + '</p>' +
+        '<a href="#">¥500鑑定を見る</a>' +
+      '</div>' +
+      '<div class="plan-card recommended">' +
+        '<div class="plan-ribbon">おすすめ</div>' +
+        '<div class="plan-head"><h4 class="mincho">個別鑑定</h4><span class="price">¥20,000</span></div>' +
+        '<p>' + escapeHtml(planGuide.sub20000) + '</p>' +
+        '<a href="#">鑑定士に相談する</a>' +
+      '</div>'
+    );
+  }
+
+  function showResult(data){
+    resultHexName.textContent = '「' + data.name + '」';
+    resultHexSub.textContent = data.changingCount > 0 ? '変爻 ' + data.changingCount + '本' : '変爻なし（安定した卦）';
+
+    if(data.interpretation.type === 'theme'){
+      interpArea.innerHTML =
+        '<div class="theme-card">' +
+          '<div class="theme-label"><span class="dot"></span>' + escapeHtml(data.interpretation.label) + '</div>' +
+          '<p>' + escapeHtml(data.interpretation.text) + '</p>' +
+        '</div>';
+    } else {
+      interpArea.innerHTML =
+        '<div class="interp-card"><span class="label">この卦が示すもの</span><p>' + escapeHtml(data.interpretation.text) + '</p></div>';
+    }
+
+    planArea.innerHTML = buildPlanHtml(data.planGuide);
+    showScreen(screenResult);
+  }
+
+  toCoinBtn.addEventListener('click', function(){
+    errorText.textContent = '';
+    toCoinBtn.disabled = true;
+
+    var mode, category, recallText;
+    if(currentMode === 'theme'){
+      mode = 'theme';
+      category = selectedCat;
+      var chipLabelEl = document.querySelector('.cat-chip[data-cat="' + selectedCat + '"] span:last-child');
+      recallText = '問い：' + (chipLabelEl ? chipLabelEl.textContent : '') + 'について';
+    } else {
+      mode = 'question';
+      recallText = '問い：' + (questionInput.value.trim() || '今、知りたいこと');
+    }
+
+    questionRecall.textContent = recallText;
+    showScreen(screenCoin);
+    throwCountEl.textContent = '0';
+    statusTextEl.textContent = '占い中…';
+    throwDetailEl.innerHTML = '&nbsp;';
+    yaoEls.forEach(function(el){ el.classList.remove('placed','yin','changing'); });
+
+    requestDivination(mode, category).then(function(data){
+      playThrows(data.throws, function(){
+        statusTextEl.textContent = '卦が立ちました';
+        showResult(data);
+      });
+    }).catch(function(){
+      showScreen(screenQuestion);
+      errorText.textContent = '通信に失敗しました。もう一度お試しください。';
+      updateStartBtn();
+    });
+  });
+
+  retryLink.addEventListener('click', function(e){
+    e.preventDefault();
+    questionInput.value = '';
+    showScreen(screenQuestion);
+    updateStartBtn();
+  });
+
+  setMode('theme');
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>命理院 凜 — あなたの悩みに合う占術を見つける</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;800&family=Zen+Kaku+Gothic+New:wght@300;400;500;700&family=Cormorant+Garamond:ital,wght@0,500;1,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14110F; --paper:#EFE8D8; --vermilion:#B23A2E; --vermilion-deep:#8C2B22;
+    --gold:#C9A86A; --gold-soft:#E8D9B0; --jade:#3B5240; --line:rgba(201,168,106,0.28);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    background:var(--ink); color:var(--paper);
+    font-family:'Zen Kaku Gothic New', sans-serif; font-weight:300;
+    min-height:100vh; display:flex; align-items:flex-start; justify-content:center;
+    padding:44px 16px 60px; -webkit-font-smoothing:antialiased;
+  }
+  .mincho{font-family:'Shippori Mincho', serif;}
+  .stage{ width:100%; max-width:420px; }
+
+  .header{ text-align:center; margin-bottom:38px; }
+  .eyebrow{
+    font-family:'Cormorant Garamond', serif; font-style:italic; letter-spacing:0.18em;
+    font-size:12px; color:var(--gold); text-transform:uppercase; display:block; margin-bottom:14px;
+  }
+  .seal{
+    width:46px;height:46px; margin:0 auto 16px;
+    border:1px solid var(--gold); border-radius:3px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Shippori Mincho',serif; font-size:22px; font-weight:800;
+    color:var(--vermilion); background:var(--paper);
+  }
+  .header h1{ font-family:'Shippori Mincho', serif; font-weight:700; font-size:21px; letter-spacing:0.04em; margin-bottom:10px; }
+  .header p{ font-size:12.5px; color:rgba(239,232,216,0.55); line-height:1.8; }
+
+  .section-label{
+    display:flex; align-items:center; gap:12px; margin:36px 0 16px;
+  }
+  .section-label .line{ flex:1; height:1px; background:var(--line); }
+  .section-label span{ font-size:11px; color:var(--gold); letter-spacing:0.12em; white-space:nowrap; }
+
+  /* ===== worry list (Step 1) ===== */
+  .worry-grid{ display:flex; flex-direction:column; gap:10px; }
+  .worry-card{
+    border:1px solid var(--line); background:rgba(239,232,216,0.03);
+    padding:16px 18px; text-align:left; cursor:pointer;
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    transition:border-color .2s ease, background .2s ease;
+  }
+  .worry-card:active{ background:rgba(201,168,106,0.08); }
+  .worry-card.active{ border-color:var(--gold); background:rgba(201,168,106,0.08); }
+  .worry-card .worry-text{ font-size:13px; color:rgba(239,232,216,0.85); line-height:1.6; }
+  .worry-card .worry-text .icon{ color:var(--vermilion); margin-right:8px; font-family:'Shippori Mincho',serif; }
+  .worry-card .chev{ color:var(--gold); font-size:14px; flex-shrink:0; transition:transform .2s ease; }
+  .worry-card.active .chev{ transform:rotate(90deg); }
+
+  .worry-answer{
+    display:none;
+    padding:14px 18px 18px; margin-top:-10px;
+    border:1px solid var(--gold); border-top:none;
+    background:rgba(201,168,106,0.04);
+  }
+  .worry-answer.show{ display:block; }
+  .worry-answer .recommend-tag{
+    display:inline-block; font-size:10.5px; letter-spacing:0.05em; color:var(--vermilion);
+    border:1px solid var(--vermilion); padding:3px 10px; border-radius:20px; margin-bottom:8px;
+  }
+  .worry-answer h4{ font-family:'Shippori Mincho',serif; font-size:14px; margin-bottom:6px; color:var(--gold-soft); }
+  .worry-answer p{ font-size:12px; color:rgba(239,232,216,0.65); line-height:1.75; }
+
+  /* ===== divination cards (Step 2) ===== */
+  .div-card{
+    border:1px solid var(--line); background:rgba(239,232,216,0.03);
+    padding:22px 20px; margin-bottom:14px; text-decoration:none; color:inherit; display:block;
+    position:relative; transition:transform .2s ease;
+  }
+  .div-card.live{ border-color:var(--vermilion); box-shadow:0 0 0 1px var(--vermilion); }
+  .div-card.live:active{ transform:scale(0.98); }
+  .div-card.soon{ opacity:0.55; cursor:default; }
+
+  .div-ribbon{
+    position:absolute; top:-1px; right:18px; font-size:10px; padding:3px 10px;
+    font-family:'Shippori Mincho',serif;
+  }
+  .div-ribbon.live{ background:var(--vermilion); color:var(--paper); }
+  .div-ribbon.soon{ background:var(--gold); color:var(--ink); }
+
+  .div-head{ display:flex; align-items:baseline; gap:10px; margin-bottom:8px; }
+  .div-head h3{ font-family:'Shippori Mincho',serif; font-size:17px; }
+  .div-head .romaji{ font-family:'Cormorant Garamond',serif; font-style:italic; font-size:11px; color:var(--gold); }
+  .div-card p{ font-size:12.5px; color:rgba(239,232,216,0.65); line-height:1.8; margin-bottom:12px; }
+
+  .div-tags{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; }
+  .div-tags span{
+    font-size:10.5px; color:rgba(239,232,216,0.55); border:1px solid var(--line);
+    padding:3px 9px; border-radius:20px;
+  }
+
+  .div-cta{ display:flex; align-items:center; gap:6px; font-size:12.5px; font-family:'Shippori Mincho',serif; }
+  .div-cta.live{ color:var(--gold-soft); }
+  .div-cta.soon{ color:rgba(239,232,216,0.4); }
+  .div-cta .arrow{ color:var(--gold); }
+
+  .note{ margin-top:30px; font-size:11px; color:rgba(239,232,216,0.4); line-height:1.9; text-align:center; }
+</style>
+</head>
+<body>
+
+<div class="stage">
+
+  <div class="header">
+    <span class="eyebrow">I Ching ・ Shichu Suimei ・ Kyusei Kigaku</span>
+    <div class="seal">凜</div>
+    <h1 class="mincho">あなたの悩みに合う占術を見つける</h1>
+    <p>占術にはそれぞれ得意な領域があります。<br>気になる悩みを選んで、向いている占術を確認してみてください。</p>
+  </div>
+
+  <!-- ===== STEP 1: 悩みから探す ===== -->
+  <div class="section-label"><span class="line"></span><span>悩みから占術を探す</span><span class="line"></span></div>
+
+  <div class="worry-grid" id="worryGrid">
+
+    <div class="worry-card" data-target="a1">
+      <span class="worry-text"><span class="icon">問</span>今すぐ、これをすべきか迷っている</span>
+      <span class="chev">▸</span>
+    </div>
+    <div class="worry-answer" id="a1">
+      <span class="recommend-tag">易経が向いています</span>
+      <h4 class="mincho">一つの問いに、一つの答えを</h4>
+      <p>「やるべきか、やらないべきか」「今がその時かどうか」など、具体的な一件についてその場で答えを出したいときに向いています。</p>
+    </div>
+
+    <div class="worry-card" data-target="a2">
+      <span class="worry-text"><span class="icon">問</span>自分の性格・才能・適職を知りたい</span>
+      <span class="chev">▸</span>
+    </div>
+    <div class="worry-answer" id="a2">
+      <span class="recommend-tag">四柱推命が向いています</span>
+      <h4 class="mincho">生まれ持った構造を読む</h4>
+      <p>生年月日時から、あなた固有の性格・才能・向いている方向性を読み解きます。長期的な自己理解に向いています。</p>
+    </div>
+
+    <div class="worry-card" data-target="a3">
+      <span class="worry-text"><span class="icon">問</span>今年・今月の運気の流れを知りたい</span>
+      <span class="chev">▸</span>
+    </div>
+    <div class="worry-answer" id="a3">
+      <span class="recommend-tag">九星気学が向いています</span>
+      <h4 class="mincho">巡る年・月の運気を読む</h4>
+      <p>年や月の巡りによって変化する運気の流れを扱う占術です。「今年は、今月はどう過ごすべきか」に向いています。</p>
+    </div>
+
+    <div class="worry-card" data-target="a4">
+      <span class="worry-text"><span class="icon">問</span>引っ越しや移転の方位が気になる</span>
+      <span class="chev">▸</span>
+    </div>
+    <div class="worry-answer" id="a4">
+      <span class="recommend-tag">九星気学が向いています</span>
+      <h4 class="mincho">方位の吉凶を読む</h4>
+      <p>方位の吉凶を専門に扱う占術です。引っ越し・移転・旅行先の方位を考えるときに向いています。</p>
+    </div>
+
+    <div class="worry-card" data-target="a5">
+      <span class="worry-text"><span class="icon">問</span>あの人との相性が知りたい</span>
+      <span class="chev">▸</span>
+    </div>
+    <div class="worry-answer" id="a5">
+      <span class="recommend-tag">四柱推命が向いています</span>
+      <h4 class="mincho">互いの命式を読み合わせる</h4>
+      <p>二人それぞれの生まれ持った構造を比較することで、関係性の傾向を読み解きます。恋愛・対人関係の相性に向いています。</p>
+    </div>
+
+    <div class="worry-card" data-target="a6">
+      <span class="worry-text"><span class="icon">問</span>人生全体の方向性に迷っている</span>
+      <span class="chev">▸</span>
+    </div>
+    <div class="worry-answer" id="a6">
+      <span class="recommend-tag">四柱推命が向いています</span>
+      <h4 class="mincho">一生を通じた運勢の構造</h4>
+      <p>短期的な答えではなく、人生全体を通じた運勢の流れや向いている方向性を知りたいときに向いています。</p>
+    </div>
+
+  </div>
+
+  <!-- ===== STEP 2: 占術一覧 ===== -->
+  <div class="section-label"><span class="line"></span><span>占術から選ぶ</span><span class="line"></span></div>
+
+  <a class="div-card live" href="iching/index.html">
+    <span class="div-ribbon live">今すぐ占える</span>
+    <div class="div-head">
+      <h3 class="mincho">易経</h3>
+      <span class="romaji">I Ching</span>
+    </div>
+    <p>コイン三枚を六回投じ、卦を立てる占術。一つの問いに一つの答えを出します。</p>
+    <div class="div-tags"><span>今すぐの決断</span><span>YES/NO</span><span>一回限りの問い</span></div>
+    <div class="div-cta live">占ってみる <span class="arrow">→</span></div>
+  </a>
+
+  <a class="div-card live" href="shichu-suimei/free.html">
+    <span class="div-ribbon live">今すぐ占える</span>
+    <div class="div-head">
+      <h3 class="mincho">四柱推命</h3>
+      <span class="romaji">Shichu Suimei</span>
+    </div>
+    <p>生年月日時から命式を算出し、性格・才能・人生全体の流れを読み解く占術。</p>
+    <div class="div-tags"><span>性格・才能</span><span>相性</span><span>人生の方向性</span></div>
+    <div class="div-cta live">占ってみる <span class="arrow">→</span></div>
+  </a>
+
+  <a class="div-card live" href="kyusei-kigaku/free.html">
+    <span class="div-ribbon live">今すぐ占える</span>
+    <div class="div-head">
+      <h3 class="mincho">九星気学</h3>
+      <span class="romaji">Kyusei Kigaku</span>
+    </div>
+    <p>年・月の巡りと方位の吉凶を扱う占術。今の運気の流れと、動くべき方位を読み解きます。</p>
+    <div class="div-tags"><span>今年・今月の運気</span><span>方位</span><span>引っ越し</span></div>
+    <div class="div-cta live">占ってみる <span class="arrow">→</span></div>
+  </a>
+
+</div>
+
+<script>
+(function(){
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.worry-card'));
+  cards.forEach(function(card){
+    card.addEventListener('click', function(){
+      var targetId = card.getAttribute('data-target');
+      var answer = document.getElementById(targetId);
+      var isOpen = answer.classList.contains('show');
+
+      document.querySelectorAll('.worry-answer.show').forEach(function(a){ a.classList.remove('show'); });
+      document.querySelectorAll('.worry-card.active').forEach(function(c){ c.classList.remove('active'); });
+
+      if(!isOpen){
+        answer.classList.add('show');
+        card.classList.add('active');
+      }
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

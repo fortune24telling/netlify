@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>今日の運気を占う（無料） — 命理院 凜</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;800&family=Zen+Kaku+Gothic+New:wght@300;400;500;700&family=Cormorant+Garamond:ital,wght@0,500;1,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14110F; --paper:#EFE8D8; --vermilion:#B23A2E; --vermilion-deep:#8C2B22;
+    --gold:#C9A86A; --gold-soft:#E8D9B0; --jade:#3B5240; --line:rgba(201,168,106,0.28);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    background:var(--ink); color:var(--paper);
+    font-family:'Zen Kaku Gothic New', sans-serif; font-weight:300;
+    min-height:100vh; display:flex; align-items:flex-start; justify-content:center;
+    padding:36px 16px 60px; -webkit-font-smoothing:antialiased;
+  }
+  .mincho{font-family:'Shippori Mincho', serif;}
+  .stage{ width:100%; max-width:380px; text-align:center; }
+
+  .eyebrow{
+    font-family:'Cormorant Garamond', serif; font-style:italic; letter-spacing:0.18em;
+    font-size:12px; color:var(--gold); text-transform:uppercase; display:block; margin-bottom:14px;
+  }
+  .free-badge{
+    display:inline-block; font-size:10.5px; letter-spacing:0.05em; color:var(--jade);
+    border:1px solid var(--jade); padding:3px 10px; border-radius:20px; margin-bottom:14px;
+  }
+  .stage h1{ font-family:'Shippori Mincho', serif; font-weight:700; font-size:21px; letter-spacing:0.04em; margin-bottom:6px; }
+  .stage .sub{ font-size:12.5px; color:rgba(239,232,216,0.55); margin-bottom:30px; }
+
+  .screen{ display:none; }
+  .screen.active{ display:block; }
+
+  .intro-card{
+    border:1px solid var(--line); background:rgba(239,232,216,0.03);
+    padding:24px 22px; margin-bottom:24px; text-align:left;
+  }
+  .intro-card p{ font-size:13px; color:rgba(239,232,216,0.72); line-height:1.85; }
+  .intro-card p + p{ margin-top:10px; }
+  .intro-card .fixed-q{
+    margin-top:14px; padding:12px 14px; border:1px solid var(--gold); border-radius:2px;
+    font-family:'Shippori Mincho',serif; font-size:14px; color:var(--gold-soft);
+  }
+
+  .coin-tray{ display:flex; justify-content:center; gap:18px; height:120px; align-items:center; margin-bottom:18px; perspective:600px; }
+  .coin{ width:58px;height:58px; position:relative; transform-style:preserve-3d; }
+  .coin .face{
+    position:absolute;inset:0; border-radius:50%; display:flex;align-items:center;justify-content:center;
+    backface-visibility:hidden; border:1px solid var(--gold); font-family:'Shippori Mincho',serif; font-size:13px; font-weight:700;
+  }
+  .coin .face.omote{ background:radial-gradient(circle at 35% 30%, #E8D9B0, #B8923F 75%); color:#3A2C12; }
+  .coin .face.ura{ background:radial-gradient(circle at 35% 30%, #4a4138, #1c1714 75%); color:var(--gold-soft); transform:rotateY(180deg); }
+  .coin.tossing{ animation:toss 0.9s cubic-bezier(.34,1.56,.64,1) forwards; }
+  .coin.result-omote{ transform:rotateY(0deg); }
+  .coin.result-ura{ transform:rotateY(180deg); }
+  @keyframes toss{
+    0%{ transform:translateY(0) rotateY(0deg) rotateX(0deg); }
+    35%{ transform:translateY(-46px) rotateY(540deg) rotateX(120deg); }
+    70%{ transform:translateY(-10px) rotateY(1080deg) rotateX(240deg); }
+    100%{ transform:translateY(0) rotateY(var(--final-y, 1440deg)) rotateX(360deg); }
+  }
+  .coin-labels{ display:flex;justify-content:center;gap:18px; margin-bottom:26px; height:16px; }
+  .coin-labels span{ width:58px; font-size:11px; color:var(--gold); letter-spacing:0.04em; opacity:0; transition:opacity .3s ease; }
+  .coin-labels span.show{ opacity:1; }
+
+  .status-row{ display:flex; justify-content:center; align-items:center; gap:14px; margin-bottom:22px; font-size:12.5px; color:rgba(239,232,216,0.6); }
+  .status-row .count{ color:var(--gold-soft); font-family:'Cormorant Garamond',serif; font-size:18px; }
+  .status-row .divider{ color:var(--line); }
+
+  .hexagram{ display:flex; flex-direction:column-reverse; gap:9px; width:160px; margin:0 auto 24px; }
+  .yao{ height:11px; width:100%; position:relative; opacity:0.18; transition:opacity .5s ease; }
+  .yao.placed{ opacity:1; }
+  .yao .bar{ position:absolute;inset:0; background:var(--gold); border-radius:1px; }
+  .yao.yin .bar{ left:0; width:42%; }
+  .yao .bar.right{ display:none; }
+  .yao.yin .bar.right{ left:58%; width:42%; display:block; }
+  .yao .changing-dot{
+    position:absolute; left:50%; top:50%; width:5px;height:5px; border-radius:50%;
+    background:var(--vermilion); transform:translate(-50%,-50%) scale(0); transition:transform .35s ease;
+  }
+  .yao.changing .changing-dot{ transform:translate(-50%,-50%) scale(1); }
+
+  .throw-detail{ min-height:18px; font-size:12px; color:rgba(239,232,216,0.4); margin-bottom:20px; letter-spacing:0.02em; }
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center; gap:8px; width:100%;max-width:300px;
+    padding:15px 24px; font-family:'Shippori Mincho', serif; font-size:14.5px;letter-spacing:0.06em;
+    border-radius:2px; cursor:pointer; transition:transform .2s ease, opacity .2s ease;
+  }
+  .btn-primary{ background:linear-gradient(135deg, var(--vermilion), var(--vermilion-deep)); color:var(--paper); border:1px solid rgba(232,217,176,0.25); }
+  .btn:active{ transform:scale(0.97); }
+  .btn:disabled{ opacity:0.45; cursor:default; transform:none; }
+
+  .result-eyebrow{ font-size:11.5px; color:var(--gold); letter-spacing:0.06em; margin-bottom:8px; }
+  .result-name{ font-family:'Shippori Mincho',serif; font-size:25px; color:var(--gold-soft); margin-bottom:4px; }
+  .result-sub{ font-size:12px; color:rgba(239,232,216,0.5); margin-bottom:22px; }
+
+  .interp-card{
+    border:1px solid var(--line); background:rgba(239,232,216,0.03); padding:20px 20px 18px; text-align:left; margin-bottom:18px;
+  }
+  .interp-card .label{ font-size:11px; color:var(--gold); letter-spacing:0.05em; margin-bottom:8px; display:block; }
+  .interp-card p{ font-size:13px; color:rgba(239,232,216,0.8); line-height:1.85; }
+
+  .locked-card{
+    border:1px dashed var(--line); padding:16px 18px; text-align:left; margin-bottom:24px; background:rgba(239,232,216,0.015);
+  }
+  .locked-card .label{ font-size:11px; color:rgba(239,232,216,0.4); letter-spacing:0.05em; margin-bottom:10px; display:block; }
+  .locked-row{ display:flex; gap:10px; font-size:12.5px; color:rgba(239,232,216,0.45); margin-bottom:8px; align-items:flex-start; }
+  .locked-row:last-child{ margin-bottom:0; }
+  .locked-row .mark{ flex-shrink:0; width:14px; color:rgba(239,232,216,0.3); }
+
+  .upsell-card{
+    border:1px solid var(--vermilion); box-shadow:0 0 0 1px var(--vermilion);
+    padding:20px 20px 18px; text-align:left; margin-bottom:22px; background:rgba(178,58,46,0.06);
+  }
+  .upsell-card .ribbon{
+    display:inline-block; background:var(--vermilion); color:var(--paper); font-size:10px; padding:3px 10px;
+    font-family:'Shippori Mincho',serif; margin-bottom:10px;
+  }
+  .upsell-card h4{ font-family:'Shippori Mincho',serif; font-size:16px; margin-bottom:8px; }
+  .upsell-card p{ font-size:12.5px; color:rgba(239,232,216,0.7); margin-bottom:14px; line-height:1.75; }
+  .upsell-card .price{ font-family:'Cormorant Garamond',serif; font-size:20px; color:var(--gold-soft); margin-bottom:14px; display:block; }
+  .upsell-card a{
+    display:block; text-align:center; font-size:13.5px; font-family:'Shippori Mincho',serif; padding:13px;
+    background:var(--gold); color:var(--ink); font-weight:600; text-decoration:none;
+  }
+  .upsell-card.premium{
+    border-color:var(--gold); box-shadow:0 0 0 1px var(--gold); background:rgba(201,168,106,0.06);
+  }
+  .upsell-card.premium .ribbon{ background:var(--gold); color:var(--ink); }
+  .upsell-card.premium a{ background:transparent; border:1px solid var(--gold); color:var(--gold-soft); font-weight:400; }
+
+  .retry-link{ display:block; text-align:center; margin-top:4px; font-size:12px; color:rgba(239,232,216,0.4); text-decoration:underline; }
+  .error-text{ font-size:12px; color:var(--vermilion); margin-top:10px; }
+
+  @media (prefers-reduced-motion: reduce){ .coin.tossing{ animation-duration:0.01s; } }
+</style>
+</head>
+<body>
+
+<div class="stage">
+
+  <!-- SCREEN 1: イントロ -->
+  <div class="screen active" id="screenIntro">
+    <span class="eyebrow">I Ching ・ Coin Oracle</span>
+    <span class="free-badge">無料診断</span>
+    <h1 class="mincho">今日の運気を占う</h1>
+    <p class="sub">コイン三枚を六回投じ、今日の卦を立てます</p>
+
+    <div class="intro-card">
+      <p>無料診断では、問いはあらかじめ「今日の運気はどうか」に定められています。</p>
+      <p>ご自身の問いを自由に立てて占いたい場合は、¥500の鑑定をご利用ください。</p>
+      <div class="fixed-q">今日の問い：「今日の運気はどうか」</div>
+    </div>
+
+    <button class="btn btn-primary" id="toCoinBtn" style="margin:0 auto;">コインを投げる</button>
+    <div class="error-text" id="errorText"></div>
+  </div>
+
+  <!-- SCREEN 2: コイン投げ -->
+  <div class="screen" id="screenCoin">
+    <span class="eyebrow">I Ching ・ Coin Oracle</span>
+    <h1 class="mincho">占い中</h1>
+    <p class="sub">今日の問い：「今日の運気はどうか」</p>
+
+    <div class="coin-tray">
+      <div class="coin" id="coin0"><div class="face omote">陽</div><div class="face ura">陰</div></div>
+      <div class="coin" id="coin1"><div class="face omote">陽</div><div class="face ura">陰</div></div>
+      <div class="coin" id="coin2"><div class="face omote">陽</div><div class="face ura">陰</div></div>
+    </div>
+    <div class="coin-labels" id="coinLabels">
+      <span id="label0"></span><span id="label1"></span><span id="label2"></span>
+    </div>
+
+    <div class="status-row">
+      <span>第 <span class="count" id="throwCount">0</span> / 6 投目</span>
+      <span class="divider">｜</span>
+      <span id="statusText">投げています…</span>
+    </div>
+
+    <div class="hexagram" id="hexagram">
+      <div class="yao"><div class="bar"></div><div class="bar right"></div><div class="changing-dot"></div></div>
+      <div class="yao"><div class="bar"></div><div class="bar right"></div><div class="changing-dot"></div></div>
+      <div class="yao"><div class="bar"></div><div class="bar right"></div><div class="changing-dot"></div></div>
+      <div class="yao"><div class="bar"></div><div class="bar right"></div><div class="changing-dot"></div></div>
+      <div class="yao"><div class="bar"></div><div class="bar right"></div><div class="changing-dot"></div></div>
+      <div class="yao"><div class="bar"></div><div class="bar right"></div><div class="changing-dot"></div></div>
+    </div>
+
+    <div class="throw-detail" id="throwDetail">&nbsp;</div>
+  </div>
+
+  <!-- SCREEN 3: 結果（簡易・誘導つき） -->
+  <div class="screen" id="screenResult">
+    <div class="result-eyebrow">今日の卦は</div>
+    <div class="result-name mincho" id="resultHexName"></div>
+    <div class="result-sub" id="resultHexSub">今日の運気を示す卦が立ちました</div>
+
+    <div class="interp-card">
+      <span class="label">この卦が示すもの</span>
+      <p id="interpText"></p>
+    </div>
+
+    <div class="locked-card">
+      <span class="label">無料診断には含まれません</span>
+      <div class="locked-row"><span class="mark">－</span><span>変爻が示す「これから何がどう変わるか」の意味</span></div>
+      <div class="locked-row"><span class="mark">－</span><span>ご自身で立てた、具体的な問いに対する解釈</span></div>
+      <div class="locked-row"><span class="mark">－</span><span>仕事・恋愛・健康などテーマ別の読み解き</span></div>
+    </div>
+
+    <div class="upsell-card">
+      <span class="ribbon">¥500 鑑定</span>
+      <h4 class="mincho">自分の問いで占う</h4>
+      <p>今、本当に気になっていること――仕事、恋愛、お金、健康など――を自分の言葉で問い、変爻まで含めた詳しい解釈を受け取れます。</p>
+      <span class="price">¥500 / 1回</span>
+      <a href="paid.html">¥500鑑定をはじめる</a>
+    </div>
+
+    <div class="upsell-card premium">
+      <span class="ribbon">個別鑑定</span>
+      <h4 class="mincho">鑑定士に相談する</h4>
+      <p>事前にお悩みをお伺いし、鑑定士がコイン三枚法で立てた卦を、あなたの状況に当てはめて手作業で読み解きます。</p>
+      <span class="price">¥20,000</span>
+      <a href="#">個別鑑定を申し込む</a>
+    </div>
+
+    <a class="retry-link" id="retryLink" href="#">明日また占う</a>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  // ============================================================
+  // このスクリプトは見た目の制御だけを行います。
+  // コインの判定ロジック・64卦データ・解釈文は
+  // サーバー側（/api/divine）にあり、ここには存在しません。
+  // ============================================================
+
+  var coinEls = [document.getElementById('coin0'), document.getElementById('coin1'), document.getElementById('coin2')];
+  var labelEls = [document.getElementById('label0'), document.getElementById('label1'), document.getElementById('label2')];
+  var throwCountEl = document.getElementById('throwCount');
+  var statusTextEl = document.getElementById('statusText');
+  var throwDetailEl = document.getElementById('throwDetail');
+  var yaoEls = Array.prototype.slice.call(document.querySelectorAll('#screenCoin .yao'));
+
+  var screenIntro = document.getElementById('screenIntro');
+  var screenCoin = document.getElementById('screenCoin');
+  var screenResult = document.getElementById('screenResult');
+  var resultHexName = document.getElementById('resultHexName');
+  var interpText = document.getElementById('interpText');
+  var toCoinBtn = document.getElementById('toCoinBtn');
+  var retryLink = document.getElementById('retryLink');
+  var errorText = document.getElementById('errorText');
+
+  function showScreen(el){
+    [screenIntro, screenCoin, screenResult].forEach(function(s){ s.classList.remove('active'); });
+    el.classList.add('active');
+  }
+
+  function animateCoins(coinResults, callback){
+    coinEls.forEach(function(coin, i){
+      coin.classList.remove('result-omote','result-ura','tossing');
+      var finalTurns = 4 + Math.floor(Math.random()*2);
+      var extraHalf = coinResults[i] === 'ura' ? 1 : 0;
+      coin.style.setProperty('--final-y', (finalTurns*360 + extraHalf*180) + 'deg');
+      void coin.offsetWidth;
+      coin.classList.add('tossing');
+    });
+    labelEls.forEach(function(l){ l.classList.remove('show'); });
+
+    setTimeout(function(){
+      coinEls.forEach(function(coin, i){
+        coin.classList.remove('tossing');
+        coin.classList.add(coinResults[i] === 'omote' ? 'result-omote' : 'result-ura');
+      });
+      labelEls.forEach(function(l, i){
+        l.textContent = coinResults[i] === 'omote' ? '陽 ・ 表' : '陰 ・ 裏';
+        l.classList.add('show');
+      });
+      callback();
+    }, 950);
+  }
+
+  function placeYao(index, yin, changing){
+    var el = yaoEls[index];
+    el.classList.add('placed');
+    if(yin) el.classList.add('yin');
+    if(changing) el.classList.add('changing');
+  }
+
+  function requestDivination(){
+    return fetch('/api/iching/divine', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode: 'free' })
+    }).then(function(r){
+      if(!r.ok) throw new Error('request failed');
+      return r.json();
+    });
+  }
+
+  function playThrows(throws, onDone){
+    var step = 0;
+    function next(){
+      if(step >= throws.length){ onDone(); return; }
+      throwCountEl.textContent = String(step + 1);
+      var t = throws[step];
+      animateCoins(t.coins, function(){
+        placeYao(step, t.yin, t.changing);
+        step++;
+        setTimeout(next, 480);
+      });
+    }
+    next();
+  }
+
+  function finish(data){
+    resultHexName.textContent = '「' + data.name + '」';
+    interpText.textContent = data.interpretation.text;
+    showScreen(screenResult);
+  }
+
+  toCoinBtn.addEventListener('click', function(){
+    errorText.textContent = '';
+    toCoinBtn.disabled = true;
+    showScreen(screenCoin);
+    throwCountEl.textContent = '0';
+    statusTextEl.textContent = '投げています…';
+    throwDetailEl.innerHTML = '&nbsp;';
+    yaoEls.forEach(function(el){ el.classList.remove('placed','yin','changing'); });
+
+    requestDivination().then(function(data){
+      playThrows(data.throws, function(){
+        statusTextEl.textContent = '卦が立ちました';
+        finish(data);
+      });
+    }).catch(function(){
+      showScreen(screenIntro);
+      errorText.textContent = '通信に失敗しました。もう一度お試しください。';
+      toCoinBtn.disabled = false;
+    });
+  });
+
+  retryLink.addEventListener('click', function(e){
+    e.preventDefault();
+    toCoinBtn.disabled = false;
+    showScreen(screenIntro);
+  });
+})();
+</script>
+
+</body>
+</html>

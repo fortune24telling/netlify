@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>易占 — 命理院 凜</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;800&family=Zen+Kaku+Gothic+New:wght@300;400;500;700&family=Cormorant+Garamond:ital,wght@0,500;1,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14110F; --paper:#EFE8D8; --vermilion:#B23A2E; --vermilion-deep:#8C2B22;
+    --gold:#C9A86A; --gold-soft:#E8D9B0; --jade:#3B5240; --line:rgba(201,168,106,0.28);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    background:var(--ink); color:var(--paper);
+    font-family:'Zen Kaku Gothic New', sans-serif; font-weight:300;
+    min-height:100vh; display:flex; align-items:flex-start; justify-content:center;
+    padding:48px 16px 60px; -webkit-font-smoothing:antialiased;
+  }
+  .mincho{font-family:'Shippori Mincho', serif;}
+  .stage{ width:100%; max-width:380px; text-align:center; }
+
+  .eyebrow{
+    font-family:'Cormorant Garamond', serif; font-style:italic; letter-spacing:0.18em;
+    font-size:12px; color:var(--gold); text-transform:uppercase; display:block; margin-bottom:14px;
+  }
+  .seal{
+    width:48px;height:48px; margin:0 auto 18px;
+    border:1px solid var(--gold); border-radius:3px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Shippori Mincho',serif; font-size:24px; font-weight:800;
+    color:var(--vermilion); background:var(--paper);
+  }
+  .stage h1{ font-family:'Shippori Mincho', serif; font-weight:700; font-size:23px; letter-spacing:0.04em; margin-bottom:8px; }
+  .stage .sub{ font-size:12.5px; color:rgba(239,232,216,0.55); margin-bottom:42px; line-height:1.8; }
+
+  .menu-card{
+    border:1px solid var(--line); background:rgba(239,232,216,0.03);
+    padding:24px 22px; text-align:left; margin-bottom:18px;
+    text-decoration:none; color:inherit; display:block;
+    transition:border-color .2s ease, transform .2s ease;
+  }
+  .menu-card:active{ transform:scale(0.98); }
+  .menu-card.featured{ border-color:var(--vermilion); box-shadow:0 0 0 1px var(--vermilion); position:relative; }
+  .menu-ribbon{
+    position:absolute; top:-1px; right:18px; background:var(--vermilion); color:var(--paper);
+    font-size:10px; padding:3px 10px; font-family:'Shippori Mincho',serif;
+  }
+  .menu-badge{
+    display:inline-block; font-size:10.5px; letter-spacing:0.05em; padding:3px 10px;
+    border-radius:20px; margin-bottom:12px;
+  }
+  .menu-badge.free{ color:var(--jade); border:1px solid var(--jade); }
+  .menu-badge.paid{ color:var(--vermilion); border:1px solid var(--vermilion); }
+  .menu-badge.premium{ color:var(--gold); border:1px solid var(--gold); }
+  .menu-card.premium{ background:linear-gradient(160deg, rgba(201,168,106,0.08), transparent 60%); }
+  .menu-card h2{ font-family:'Shippori Mincho',serif; font-size:17px; margin-bottom:8px; display:flex; align-items:baseline; gap:10px; }
+  .menu-card h2 .price{ font-family:'Cormorant Garamond',serif; font-size:16px; color:var(--gold-soft); font-weight:500; }
+  .menu-card p{ font-size:12.5px; color:rgba(239,232,216,0.65); line-height:1.8; margin-bottom:14px; }
+  .menu-card .cta{
+    display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--gold-soft);
+    font-family:'Shippori Mincho',serif;
+  }
+  .menu-card .cta .arrow{ color:var(--gold); }
+
+  .note{
+    margin-top:30px; font-size:11px; color:rgba(239,232,216,0.4); line-height:1.9;
+  }
+  .back-link{
+    display:block; text-align:center; margin-top:14px; font-size:11.5px;
+    color:rgba(239,232,216,0.45); text-decoration:underline;
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <span class="eyebrow">I Ching ・ Coin Oracle</span>
+  <div class="seal">凜</div>
+  <h1 class="mincho">易占</h1>
+  <p class="sub">コイン三枚を六回投じ、卦を立てる占術です。<br>まずは無料診断からお試しいただけます。</p>
+
+  <a class="menu-card" href="free.html">
+    <span class="menu-badge free">無料診断</span>
+    <h2>今日の運気を占う</h2>
+    <p>問いは「今日の運気はどうか」に固定。コインを投げて、今日の卦の名前と一言の解釈を受け取れます。</p>
+    <div class="cta">占ってみる <span class="arrow">→</span></div>
+  </a>
+
+  <a class="menu-card featured" href="paid.html">
+    <span class="menu-ribbon">おすすめ</span>
+    <span class="menu-badge paid">¥500鑑定</span>
+    <h2>自分の問いで占う <span class="price">¥500</span></h2>
+    <p>気になるテーマを選ぶか、ご自身の言葉で問いを立てて占えます。変爻まで含めた詳しい解釈をお届けします。</p>
+    <div class="cta">¥500鑑定をはじめる <span class="arrow">→</span></div>
+  </a>
+
+  <a class="menu-card premium" href="#">
+    <span class="menu-badge premium">個別鑑定</span>
+    <h2>鑑定士に相談する <span class="price">¥20,000</span></h2>
+    <p>事前にお悩みをお伺いし、鑑定士がコイン三枚法で立てた卦を、あなたの状況に当てはめて手作業で読み解きます。</p>
+    <div class="cta">個別鑑定を申し込む <span class="arrow">→</span></div>
+  </a>
+
+  <p class="note">¥500鑑定・¥20,000個別鑑定はお試し公開中のため、現在お支払い手続きは発生しません。</p>
+  <a class="back-link" href="portal.html">他の占術から選びなおす</a>
+</div>
+
+</body>
+</html>
