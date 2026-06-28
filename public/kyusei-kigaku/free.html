@@ -225,7 +225,7 @@
   // ============================================================
   // このスクリプトは見た目の制御だけを行います。
   // 本命星の算出ロジック・解釈テキストはサーバー側
-  // （/api/kyusei-kigaku/kyusei-free）にあり、ここには存在しません。
+  // （/.netlify/functions/kyusei-kigaku-kyusei-free）にあり、ここには存在しません。
   // ============================================================
 
   var selYear = document.getElementById('selYear');
@@ -294,7 +294,7 @@
   }
 
   function requestDiagnosis(year, month, day){
-    return fetch('/api/kyusei-kigaku/kyusei-free', {
+    return fetch('/.netlify/functions/kyusei-kigaku-kyusei-free', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ year: year, month: month, day: day })

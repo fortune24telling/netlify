@@ -258,7 +258,7 @@
   // ============================================================
   // このスクリプトは見た目の制御だけを行います。
   // 本命星の算出ロジック・性格解釈・今年の運気判定はサーバー側
-  // （/api/kyusei-kigaku/kyusei-paid）にあり、ここには存在しません。
+  // （/.netlify/functions/kyusei-kigaku-kyusei-paid）にあり、ここには存在しません。
   // ============================================================
 
   var selYear = document.getElementById('selYear');
@@ -333,7 +333,7 @@
   }
 
   function requestDiagnosis(year, month, day){
-    return fetch('/api/kyusei-kigaku/kyusei-paid', {
+    return fetch('/.netlify/functions/kyusei-kigaku-kyusei-paid', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ year: year, month: month, day: day })

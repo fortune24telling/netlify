@@ -254,7 +254,7 @@
   // ============================================================
   // このスクリプトは見た目の制御だけを行います。
   // 命式の算出ロジック・性格解釈・歳運判定はサーバー側
-  // （/api/shichu-suimei/bazi-paid）にあり、ここには存在しません。
+  // （/.netlify/functions/shichu-suimei-bazi-paid）にあり、ここには存在しません。
   // ============================================================
 
   var selYear = document.getElementById('selYear');
@@ -370,7 +370,7 @@
   }
 
   function requestDiagnosis(payload){
-    return fetch('/api/shichu-suimei/bazi-paid', {
+    return fetch('/.netlify/functions/shichu-suimei-bazi-paid', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)

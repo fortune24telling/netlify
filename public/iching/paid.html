@@ -249,7 +249,7 @@
   // ============================================================
   // このスクリプトは「見た目の制御」だけを行います。
   // コインの判定ロジック・64卦データ・解釈テンプレートは
-  // すべてサーバー側（/api/divine）にあり、ここには存在しません。
+  // すべてサーバー側（/.netlify/functions/iching-divine）にあり、ここには存在しません。
   // ============================================================
 
   var modeTabs = Array.prototype.slice.call(document.querySelectorAll('.mode-tab'));
@@ -366,7 +366,7 @@
 
   // ---- サーバーに「占って」とリクエストし、結果を受け取る ----
   function requestDivination(mode, category){
-    return fetch('/api/iching/divine', {
+    return fetch('/.netlify/functions/iching-divine', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ mode: mode, category: category })

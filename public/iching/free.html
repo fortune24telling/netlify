@@ -239,7 +239,7 @@
   // ============================================================
   // このスクリプトは見た目の制御だけを行います。
   // コインの判定ロジック・64卦データ・解釈文は
-  // サーバー側（/api/divine）にあり、ここには存在しません。
+  // サーバー側（/.netlify/functions/iching-divine）にあり、ここには存在しません。
   // ============================================================
 
   var coinEls = [document.getElementById('coin0'), document.getElementById('coin1'), document.getElementById('coin2')];
@@ -295,7 +295,7 @@
   }
 
   function requestDivination(){
-    return fetch('/netlify/functions/iching-divine', {
+    return fetch('/.netlify/functions/iching-divine', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ mode: 'free' })
