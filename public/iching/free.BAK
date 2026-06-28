@@ -295,7 +295,7 @@
   }
 
   function requestDivination(){
-    return fetch('/netlify/functions/iching-divine', {
+    return fetch('/api/iching/divine', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ mode: 'free' })
